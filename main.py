@@ -77,7 +77,7 @@ class CSVOperation(object):
         self.CSVFile =  merged
         
         
-    def findDifference(self, column_name):
+    def findDifference(self, column_name, file_prefix):
         columnData = []
         difference = []
         required_rows = []
@@ -106,7 +106,7 @@ class CSVOperation(object):
             required_row_numbers = required_rows[count]
             r = [i for i in range(max(required_row_numbers)) if i not in required_row_numbers]     
             fl = fl.drop(fl.index[r])
-            fl.to_csv("difference_%d.csv"%count, sep="\t") 
+            fl.to_csv("{0}_{1}.csv".format(file_prefix, count+1), sep="\t") 
 
             
                     
@@ -141,10 +141,20 @@ class CSVOperation(object):
         
         
         
-        #df.to_csv("%s_filtered.csv"%(file["name"]))
 
-    def getOnly(self):
-        pass
+    def getOnly(self, column_name):
+        intersecting_columns = []
+        onlyData = []
+        for count, fl in enumerate(self.read_files):
+            intersecting_columns.append(fl[column_name])
+        intersecting_columns = list(set.intersection(*map(set,intersecting_columns)))
+        for fl in self.read_files:
+            fl.loc[ fl[column_name].isin(intersecting_columns) ]
+        
+        for count, f in enumerate(self.read_files):
+            onlyData.append( f[ ~f[column_name].isin(intersecting_columns) ] )
+            onlyData[count].to_csv("only-%d"%count+1, sep="\t") 
+        return onlyData
 
 
     def saveCSV(self, filename, dict = {}):
@@ -162,49 +172,21 @@ class CSVOperation(object):
 
     
     
+# change this
 
 
-
-Operation = CSVOperation({'name': '1.csv', 'separator':'\t'}, {'name': '2.csv', 'separator':'\t'})
+Operation = CSVOperation({'name': '1.csv', 'separator':','}, {'name': '2.csv', 'separator':','})
 
 col_name = " Lastname"
 
-Operation.mergeCSV()
-    
-Operation.saveCSV("merged.csv")
-
-Operation.findIntersection(col_name)
-
-Operation.findDifference(col_name)
 
 
+print(Operation.getOnly(col_name))
 
-
-"""        
-Operation = CSVOperation({'name': '1.csv', 'separator':'\t'}, {'name': '2.csv', 'separator':'\t'})
-
-f = Operation.read_files
-
-Differences = Operation.findDifference("Internal IP Address")
-
-mgd = Operation.mergeCSV()
-
-f0 = dict(f[0])
-
-merged = Operation.mergeCSV()
-
-saved = Operation.saveCSV("merged.csv")
-
-Filtered = Operation.filterDuplicates(file={"name": "merged.csv", "separator": ","}, column_name="Internal IP Address")
-
-intersection = Operation.findIntersection("Internal IP Address")
-
-"""
 
 
             
             
         
             
-
 
