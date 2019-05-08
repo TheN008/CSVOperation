@@ -187,17 +187,6 @@ class CSVOperation(object):
             writer.writerows(CSVData)
 
     
-    
-# change this
-
-
-Operation = CSVOperation({'name': '1.csv', 'separator':','}, {'name': '2.csv', 'separator':','})
-
-col_name = " Lastname"
-
-
-
-print(Operation.getOnly(col_name))
 
 
 
