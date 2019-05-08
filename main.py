@@ -44,6 +44,7 @@ class CSVOperation(object):
 
     
     def readCSV(self, filenames):
+
         if(len(filenames)==1):
             self.CSVFile = dict(pandas.read_csv(filenames['name'], sep=filenames['separator']))
         else:
@@ -56,6 +57,15 @@ class CSVOperation(object):
                 
     
     def mergeCSV(self):
+        """
+            This method merges two CSV files into one
+            It requires the csv files to be passed during class initializatin,
+            To save the merged CSV file, call the saveCSV method after caling mergeCSV
+            Eg:
+                Operation = CSVOperation({ "name": "1.csv", separator:"\t" },{ "name": "2.csv", separator:"," })
+                Operation.mergeCSV()
+                Operation.saveCSV("1+2.csv") # a new file is created with name `1+2.csv` in current directory
+        """
         titles = []
         unique_keys = set([])
         merged = {}
@@ -78,6 +88,12 @@ class CSVOperation(object):
         
         
     def findDifference(self, column_name, file_prefix):
+        """
+            This method finds the differences in number of csv files passed during initialization.
+            Eg:
+                Operation = CSVOperation({ "name": "1.csv", separator:"\t" },{ "name": "2.csv", separator:"," })
+                Operation.findDifference("Lastname", "nameData-differences")
+        """
         columnData = []
         difference = []
         required_rows = []
@@ -157,7 +173,7 @@ class CSVOperation(object):
         return onlyData
 
 
-    def saveCSV(self, filename, dict = {}):
+    def saveCSV(self, filename):
         header = self.CSVFile.keys()
         rows = []
         for key,value in self.CSVFile.items():
